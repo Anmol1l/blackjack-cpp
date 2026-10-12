@@ -1,0 +1,14 @@
+# CLion
+.idea/
+
+# CMake build directories
+cmake-build-*/
+
+# Compiled files
+*.o
+*.obj
+*.exe
+*.out
+
+# macOS
+.DS_Store
