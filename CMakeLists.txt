@@ -8,4 +8,5 @@ add_executable(blackjack-cpp src/main.cpp
         src/Card.h
         src/Deck.cpp
         src/Deck.h
-        src/Random.h)
+        src/Random.h
+)

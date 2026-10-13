@@ -41,7 +41,7 @@ struct Card {
 
     friend std::ostream &operator<<(std::ostream &out, const Card &card);
 
-    int value() const;
+    [[nodiscard]] int value() const;
 };
 
 
