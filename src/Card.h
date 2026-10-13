@@ -1,5 +1,5 @@
-#ifndef BLACKJACK_CPP_DECK_H
-#define BLACKJACK_CPP_DECK_H
+#ifndef BLACKJACK_CPP_CARD_H
+#define BLACKJACK_CPP_CARD_H
 #include <array>
 
 struct Card {
@@ -45,4 +45,4 @@ struct Card {
 };
 
 
-#endif //BLACKJACK_CPP_DECK_H
+#endif //BLACKJACK_CPP_CARD_H

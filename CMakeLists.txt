@@ -5,4 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(blackjack-cpp src/main.cpp
         src/Card.cpp
-        src/Card.h)
+        src/Card.h
+        src/Deck.cpp
+        src/Deck.h
+        src/Random.h)
