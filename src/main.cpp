@@ -3,18 +3,48 @@
 #include <iostream>
 
 namespace Settings {
-    constexpr int bust {21};
-    constexpr int stopDraw {17};
+    constexpr int bust{21};
+    constexpr int stopDraw{17};
 }
 
 struct Player {
     int score{};
 };
 
-int dealerDraw(Deck& deck) {
+bool hasExtraInput() {
+    return !std::cin.eof() && std::cin.peek() != '\n';
+}
+
+void ignoreExtraInput() {
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+char getInput() {
+    while (true) {
+        char input {};
+        std::cout << "(h) to hit, or (s) to stand: ";
+        std::cin >> input;
+        if (hasExtraInput()) {
+            ignoreExtraInput();
+            std::cout << "Enter a valid Input\n";
+            continue;
+        }
+        if (input == 'h' || input == 's') {
+            return input;
+        }
+    }
+}
+
+int dealerDraw(Deck &deck) {
     Card dealerCard = {deck.dealCard()};
     std::cout << "The dealer flips a " << dealerCard << ".  ";
     return dealerCard.value();
+}
+
+int playerDraw(Deck &deck) {
+    Card playerCard = {deck.dealCard()};
+    std::cout << "You were delt " << playerCard << ".  ";
+    return playerCard.value();
 }
 
 bool playBlackJack() {
@@ -26,6 +56,22 @@ bool playBlackJack() {
 
     std::cout << "The dealer is showing: " << dealer.score << '\n';
     std::cout << "You have score: " << player.score << '\n';
+
+    while (true) {
+        const char input{getInput()};
+        if (input == 'h') {
+            player.score += playerDraw(deck);
+            std::cout << "You now have: " << player.score << '\n';
+        }
+
+        if (player.score > Settings::bust) {
+            std::cout << "You went bust \n";
+            return false;
+        }
+
+        if (input == 's')
+            break;
+    }
 
     while (dealer.score < Settings::stopDraw) {
         dealer.score += dealerDraw(deck);
