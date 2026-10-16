@@ -1,6 +1,3 @@
-#ifndef BLACKJACK_CPP_RANDOM_H
-#define BLACKJACK_CPP_RANDOM_H
-
 #ifndef RANDOM_MT_H
 #define RANDOM_MT_H
 
@@ -73,5 +70,3 @@ namespace Random
 }
 
 #endif
-
-#endif //BLACKJACK_CPP_RANDOM_H

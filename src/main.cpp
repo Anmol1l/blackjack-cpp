@@ -7,6 +7,12 @@ namespace Settings {
     constexpr int stopDraw{17};
 }
 
+enum class Result {
+    player_win,
+    dealer_win,
+    tie,
+};
+
 struct Player {
     int score{};
     int aceCount{};
@@ -55,7 +61,7 @@ int playerDraw(Player &player, Deck &deck) {
     return playerCard.value();
 }
 
-bool playBlackJack() {
+Result playBlackJack() {
     Deck deck = {};
     deck.shuffle();
 
@@ -76,7 +82,6 @@ bool playBlackJack() {
         const char input{getInput()};
         if (input == 'h') {
             player.score += playerDraw(player, deck);
-            // std::cout << "You now have: " << player.score << '\n';
         }
 
         if (player.score > Settings::bust) {
@@ -87,7 +92,7 @@ bool playBlackJack() {
             if (player.score > Settings::bust) {
                 std::cout << "You now have: " << player.score << '\n';
                 std::cout << "You went bust!\n";
-                return false;
+                return Result::dealer_win;
             }
         }
 
@@ -109,7 +114,7 @@ bool playBlackJack() {
             if (dealer.score > Settings::bust) {
                 std::cout << "They now have: " << dealer.score << '\n';
                 std::cout << "The dealer went bust!\n";
-                return true;
+                return Result::player_win;
             }
         }
 
@@ -117,16 +122,22 @@ bool playBlackJack() {
     }
 
     if (player.score > dealer.score)
-        return true;
+        return Result::player_win;
 
-    return false;
+    if (player.score == dealer.score)
+        return Result::tie;
+
+    return Result::dealer_win;
 }
 
 int main() {
-    if (playBlackJack())
+    Result result = playBlackJack();
+    if (result == Result::player_win)
         std::cout << "You win!\n";
-    else
+    else if (result == Result::dealer_win)
         std::cout << "You lose!\n";
+    else
+        std::cout << "Game draw!\n";
 
     return 0;
 }
