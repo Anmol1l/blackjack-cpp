@@ -9,6 +9,7 @@ namespace Settings {
 
 struct Player {
     int score{};
+    int aceCount{};
 };
 
 bool hasExtraInput() {
@@ -21,7 +22,7 @@ void ignoreExtraInput() {
 
 char getInput() {
     while (true) {
-        char input {};
+        char input{};
         std::cout << "(h) to hit, or (s) to stand: ";
         std::cin >> input;
         if (hasExtraInput()) {
@@ -35,15 +36,22 @@ char getInput() {
     }
 }
 
-int dealerDraw(Deck &deck) {
-    Card dealerCard = {deck.dealCard()};
+void checkForAce(Player &p, const Card &c) {
+    if (c.rank == Card::rank_ace)
+        ++p.aceCount;
+}
+
+int dealerDraw(Player &dealer, Deck &deck) {
+    const Card dealerCard = {deck.dealCard()};
     std::cout << "The dealer flips a " << dealerCard << ".  ";
+    checkForAce(dealer, dealerCard);
     return dealerCard.value();
 }
 
-int playerDraw(Deck &deck) {
-    Card playerCard = {deck.dealCard()};
+int playerDraw(Player &player, Deck &deck) {
+    const Card playerCard = {deck.dealCard()};
     std::cout << "You were delt " << playerCard << ".  ";
+    checkForAce(player, playerCard);
     return playerCard.value();
 }
 
@@ -51,36 +59,61 @@ bool playBlackJack() {
     Deck deck = {};
     deck.shuffle();
 
-    Player dealer{deck.dealCard().value()};
-    Player player{deck.dealCard().value() + deck.dealCard().value()};
+    Card dealerCard{deck.dealCard()};
+    Player dealer{.score = dealerCard.value()};
+    Card playerCard1{deck.dealCard()};
+    Card playerCard2{deck.dealCard()};
+    Player player{.score = playerCard1.value() + playerCard2.value()};
 
-    std::cout << "The dealer is showing: " << dealer.score << '\n';
-    std::cout << "You have score: " << player.score << '\n';
+    checkForAce(dealer, dealerCard);
+    checkForAce(player, playerCard1);
+    checkForAce(player, playerCard2);
+
+    std::cout << "The dealer is showing: " << dealerCard << " (" << dealer.score << ")\n";
+    std::cout << "You are showing: " << playerCard1 << ' ' << playerCard2 << " (" << player.score << ")\n";
 
     while (true) {
         const char input{getInput()};
         if (input == 'h') {
-            player.score += playerDraw(deck);
-            std::cout << "You now have: " << player.score << '\n';
+            player.score += playerDraw(player, deck);
+            // std::cout << "You now have: " << player.score << '\n';
         }
 
         if (player.score > Settings::bust) {
-            std::cout << "You went bust \n";
-            return false;
+            while (player.aceCount > 0 && player.score > Settings::bust) {
+                player.score -= 10;
+                --player.aceCount;
+            }
+            if (player.score > Settings::bust) {
+                std::cout << "You now have: " << player.score << '\n';
+                std::cout << "You went bust!\n";
+                return false;
+            }
         }
 
         if (input == 's')
             break;
+
+        std::cout << "You now have: " << player.score << '\n';
     }
 
     while (dealer.score < Settings::stopDraw) {
-        dealer.score += dealerDraw(deck);
-        std::cout << "They now have: " << dealer.score << '\n';
-    }
+        dealer.score += dealerDraw(dealer, deck);
 
-    if (dealer.score > Settings::bust) {
-        std::cout << "The dealer went bust!\n";
-        return true;
+        if (dealer.score > Settings::bust) {
+            while (dealer.aceCount > 0 && dealer.score > Settings::bust) {
+                dealer.score -= 10;
+                --dealer.aceCount;
+            }
+
+            if (dealer.score > Settings::bust) {
+                std::cout << "They now have: " << dealer.score << '\n';
+                std::cout << "The dealer went bust!\n";
+                return true;
+            }
+        }
+
+        std::cout << "They now have: " << dealer.score << '\n';
     }
 
     if (player.score > dealer.score)
